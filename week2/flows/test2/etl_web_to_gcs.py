@@ -12,7 +12,7 @@ def fetch(dataset_url: str) -> pd.DataFrame:
     return df
 
 @task(log_prints=True)
-def df_clean(df = pd.DataFrame, color: str) -> pd.DataFrame:
+def df_clean(color: str, df = pd.DataFrame) -> pd.DataFrame:
     """Fix dtype issues"""
     if color == 'yellow':
         df['tpep_pickup_datetime'] = pd.to_datetime(df['tpep_pickup_datetime'])
@@ -53,7 +53,7 @@ def etl_web_to_gcs() -> None:
 
     df = fetch(dataset_url)
     print(f'Rows Before Clean: {len(df)}')
-    df_clean(df, color)
+    df_clean(color,df)
     path = write_local(df, color, dataset_file)
     write_gcs(path)
 
