@@ -12,10 +12,14 @@ def fetch(dataset_url: str) -> pd.DataFrame:
     return df
 
 @task(log_prints=True)
-def df_clean(df= pd.DataFrame) -> pd.DataFrame:
+def df_clean(df = pd.DataFrame, color: str) -> pd.DataFrame:
     """Fix dtype issues"""
-    df['tpep_pickup_datetime'] = pd.to_datetime(df['tpep_pickup_datetime'])
-    df['tpep_dropoff_datetime'] = pd.to_datetime(df['tpep_dropoff_datetime'])
+    if color == 'yellow':
+        df['tpep_pickup_datetime'] = pd.to_datetime(df['tpep_pickup_datetime'])
+        df['tpep_dropoff_datetime'] = pd.to_datetime(df['tpep_dropoff_datetime'])
+    else:
+        df['lpep_pickup_datetime'] = pd.to_datetime(df['lpep_pickup_datetime'])
+        df['lpep_dropoff_datetime'] = pd.to_datetime(df['lpep_dropoff_datetime'])
     print(df.head(2))
     print(f"columns: {df.dtypes}")
     print(f"rows: {len(df)}")
@@ -49,7 +53,7 @@ def etl_web_to_gcs() -> None:
 
     df = fetch(dataset_url)
     print(f'Rows Before Clean: {len(df)}')
-    df_clean(df)
+    df_clean(df, color)
     path = write_local(df, color, dataset_file)
     write_gcs(path)
 
